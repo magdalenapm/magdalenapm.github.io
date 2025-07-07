@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MPM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  
+    <!-- ✅ ADDED: Nunito Sans font import -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+  <style>
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: rgb(225, 225, 225);
+      cursor: none;
+      overflow-x: hidden;
+      min-height: 100vh;
+      font-family: 'Nunito Sans', sans-serif;
+    }
+    * {
+      font-family: 'Nunito Sans', sans-serif;
+      cursor: none !important;
+      }
+      
+    .background-filler {
+      min-height: 2500px;
+    }
+    .opening-filler {
+      height: 1500px;
+    }
+
+    /* Fullscreen mask PNG with fade */
+    .fullscreen-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 999;
+      user-select: none;
+      transition: opacity 0.5s ease-out;
+      opacity: 1;
+    }
+
+    /* Cursor gradient container */
+    .cursor-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1 !important;
+      border-radius: 50%;
+      background-color: transparent;
+      filter: blur(37px);
+      width: 1500px;
+      height: 1500px;
+    }
+
+    /* Gradient layers */
+    .gradient-layer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 8s ease-in-out;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      transform: translate(-50%, -50%);
+      width: 937.5px;
+      height: 937.5px;
+    }
+
+    .red {
+      background: radial-gradient(
+        circle at center,
+        rgba(125, 21, 0, 1) 0%,
+        rgba(125, 21, 0, 0.7) 50%,
+        rgba(125, 21, 0, 0.3) 75%,
+        rgba(125, 21, 0, 0) 100%
+      );
+      z-index: 3;
+    }
+
+    .green {
+      background: radial-gradient(
+        circle at center,
+        rgba(233, 171, 0, 1) 0%,
+        rgba(233, 171, 0, 0.7) 50%,
+        rgba(233, 171, 0, 0.3) 75%,
+        rgba(233, 171, 0, 0) 100%
+      );
+      z-index: 2;
+    }
+
+    .blue {
+      background: radial-gradient(
+        circle at center,
+        rgba(106, 99, 10, 1) 0%,
+        rgba(106, 99, 10, 0.7) 50%,
+        rgba(106, 99, 10, 0.3) 75%,
+        rgba(106, 99, 10, 0) 100%
+      );
+      z-index: 1;
+    }
+
+    /* Navigation styles */
+    nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 90px; /* spacing between links */
+      align-items: center;
+      z-index: 50;
+    }
+
+    nav ul li {
+      margin: 0;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: rgb(225, 225, 225);
+      font-size: 20px;
+      letter-spacing: 2px;
+      font-weight: 300;
+      transition: color 0.3s ease-in-out;
+
+      /* ⛔️ Removed font-family: sans-serif; */
+      /* ✅ Will now inherit Nunito Sans from html/body */
+    }
+
+
+    nav ul li a:hover {
+      color: white; /* Optional hover effect */
+    }
+    
+    .header {
+      position: relative;
+      list-style: none;
+      padding-bottom: 100px;
+      font-size: 35px;
+      letter-spacing: 0.5px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 150px; /* spacing between links */
+      align-items: center;
+      text-align: center;
+      z-index: 9999;
+
+      color: white;
+      opacity: 50%;
+    }
+
+    .header-desktop {
+      display: inline;  /* or block, depending on your layout */
+    }
+    .header-mobile {
+      display: none;
+    }
+
+    #cursor-cross {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 1000;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Cross lines */
+    #cursor-cross::before,
+    #cursor-cross::after {
+      content: '';
+      position: absolute;
+      background-color: rgb(96, 131, 246);
+      transition:
+        opacity 0.4s ease,
+        transform 0.4s ease; /* add transition for scale */
+      opacity: 1;
+    }
+
+    /* Default size */
+    #cursor-cross::before {
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2.5px;
+      transform: translateY(-50%) scaleX(1); /* add scaleX */
+    }
+
+    #cursor-cross::after {
+      left: 50%;
+      top: 0;
+      width: 2.5px;
+      height: 100%;
+      transform: translateX(-50%) scaleY(1); /* add scaleY */
+    }
+
+    /* On hover/clickable: shrink the cross lines before fading */
+    #cursor-cross.clickable::before {
+      transform: translateY(-50%) scaleX(0.15); /* shrink horizontally */
+      opacity: 0;
+    }
+
+    #cursor-cross.clickable::after {
+      transform: translateX(-50%) scaleY(0.15); /* shrink vertically */
+      opacity: 0;
+    }
+
+
+    /* Blue dot inside cursor-cross */
+    #cursor-cross .dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      background-color: transparent /*rgb(96, 131, 246)*/;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    /* When clickable: fade out cross lines and fade in dot with dark gray shadow */
+    #cursor-cross.clickable::before,
+    #cursor-cross.clickable::after {
+      opacity: 0;
+    }
+
+    #cursor-cross.clickable .dot {
+      opacity: 1;
+    }
+
+    /* CSS part for arrows */
+    /* Base nav link text styling (unchanged) */
+    .nav-link {
+      position: relative;
+      color: rgb(225, 225, 225);
+      font-size: 20px;        /* Keep nav text at 20px */
+      font-weight: 300;       /* Light font for nav text */
+      letter-spacing: 2px;
+      text-decoration: none;
+      user-select: none;
+      cursor: none !important;
+    }
+
+    /* Arrows styling */
+    .left-arrow,
+    .right-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%); /* Center vertically relative to link */
+      font-size: 28px;             /* 🔺 Arrows are 40% larger */
+      font-weight: 700;            /* 🔺 Arrows are bolder */
+      color: white;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0.3;                /* 🔻 Start faded */
+      transition: transform 0.1s linear, opacity 0.3s ease;
+      will-change: transform, opacity;
+    }
+
+    /* Left arrow */
+    .left-arrow {
+      left: -40px;                /* Keep consistent spacing after size increase */
+      transform-origin: 100% 50%;
+    }
+
+    /* Right arrow */
+    .right-arrow {
+      right: -40px;
+      transform-origin: 0% 50%;
+    }
+
+    /* On hover: fade arrows to full opacity */
+    .nav-link:hover .left-arrow,
+    .nav-link:hover .right-arrow {
+      opacity: 1;
+    }
+
+
+    /*------MEDIA QUERIES------*/
+    /* ✨ Gradient movement instruction */
+    .gradient-instruction {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      font-weight: 300;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      z-index: 9999;
+      text-align: center;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.6s ease;
+    }
+
+    /* ✅ Responsive NAV spacing */
+    @media (max-width: 768px) {
+      nav ul {
+        gap: 36px; /* 90px * 0.4 = 36px */
+      }
+      .header-desktop {
+        display: none;   /* hide desktop text */
+      }
+      .header-mobile {
+        display: inline; /* show mobile text */
+      }
+    }
+  
+
+    /* If text drops below readable size, split into two lines */
+    @media (max-width: 420px) {
+      .header {
+        font-size: 35px;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        line-height: 45px;
+      }
+    }
+
+    /* Only show on mobile (viewport width ≤ 768px) */
+    .mobile-only {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-only {
+        display: block;
+      }
+      nav {
+        margin-top: 10px;
+      }
+
+      .background-filler {
+        min-height: 2500px; /* originally 2500px + 500px */
+        color: rgb(121, 150, 246); 
+        color: rgb(255, 255, 255);  /*203, 35, 173*/
+        color: rgb(255, 105, 75);
+      }
+    }
+    
+
+  </style>
+</head>
+<body>
+  <!-- Cursor gradient -->
+  <div class="cursor-gradient" id="cursor">
+    <div class="gradient-layer red"></div>
+    <div class="gradient-layer green"></div>
+    <div class="gradient-layer blue"></div>
+  </div>
+
+
+  <!-- Magenta cross cursor -->
+  <div id="cursor-cross">
+    <div class="dot"></div>
+  </div>
+
+
+  <!-- Mask overlay -->
+  <picture>
+    <source srcset="mask-mobile.png" media="(max-width: 768px)" type="image/png" />
+    <a href="#header" class="no-cursor-hide" style="display:block;">
+      <img src="mask.png" alt="mask overlay" class="fullscreen-mask" id="mask" />
+    </a>
+  </picture>
+
+  <!-- Page content -->
+  <div class="background-filler">
+    <div class="opening-filler"></div>
+    <p class="header" id="header">
+      <span class="header-desktop">what are you looking for?</span>
+      <span class="header-mobile">what are you<br>looking for?</span>
+    </p>
+
+
+    <!-- HTML part: update your nav links like this -->
+    <nav>
+      <ul>
+        <li>
+          <a href="Projects List.html" class="nav-link">
+            <span class="left-arrow">&#62;</span>
+            a projects list
+            <span class="right-arrow">&#60;</span>
+          </a>
+        </li>
+        <li>
+          <a href="Experimentation.html" class="nav-link">
+            <span class="left-arrow">&#62;</span>
+            experimentation
+            <span class="right-arrow">&#60;</span>
+          </a>
+        </li>
+        <li>
+          <a href="Interactivity.html" class="nav-link">
+            <span class="left-arrow">&#62;</span>
+            interactivity
+            <span class="right-arrow">&#60;</span>
+          </a>
+        </li>
+        <li>
+          <a href="Multimedia.html" class="nav-link">
+            <span class="left-arrow">&#62;</span>
+            multimedia 
+            <span class="right-arrow">&#60;</span>
+          </a>
+        </li>
+        <li>
+          <a href="Contact Info.html" class="nav-link">
+            <span class="left-arrow">&#62;</span>
+            contact info
+            <span class="right-arrow">&#60;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+
+  <!-- Script for gradients, cursor and cross -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const gradientSize = 937.5;
+  const cursor = document.getElementById('cursor');
+  const maskImg = document.querySelector('#mask');
+  const cross = document.getElementById('cursor-cross');
+  const instruction = document.querySelector('.gradient-instruction');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const solidColors = {
+    green: 'rgb(121, 150, 246)',
+    blue: 'rgb(255, 255, 255)',
+    red: 'rgb(255, 105, 75)',
+  };
+
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  // Adjust cursor size
+  let adjustedSize = Math.round(gradientSize * 1.6);
+  if (isTouchDevice) adjustedSize -= 30;
+  cursor.style.width = `${adjustedSize}px`;
+  cursor.style.height = `${adjustedSize}px`;
+  cursor.style.filter = `blur(${Math.round(gradientSize / 25)}px)`;
+
+  // Make sure cursor is behind mask
+  cursor.style.zIndex = '0';
+  if (maskImg) maskImg.style.zIndex = '10';
+
+  // Center cursor on load
+  let targetX = window.innerWidth / 2;
+  let targetY = window.innerHeight / 2;
+  let currentX = targetX;
+  let currentY = targetY;
+
+  function animateCursor() {
+    currentX += (targetX - currentX) * 0.15;
+    currentY += (targetY - currentY) * 0.15;
+    cursor.style.left = `${currentX}px`;
+    cursor.style.top = `${currentY}px`;
+    cross.style.left = `${currentX}px`;
+    cross.style.top = `${currentY}px`;
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // Hide cursor on mobile
+  if (isTouchDevice) {
+    cross.style.display = 'none';
+    document.body.style.cursor = 'default';
+  }
+
+  // Set gradient sizes
+  const layers = {
+    red: document.querySelector('.gradient-layer.red'),
+    green: document.querySelector('.gradient-layer.green'),
+    blue: document.querySelector('.gradient-layer.blue'),
+  };
+  for (const key in layers) {
+    layers[key].style.width = `${gradientSize}px`;
+    layers[key].style.height = `${gradientSize}px`;
+  }
+
+  // Scroll fade for mask
+  window.addEventListener('scroll', () => {
+    const maxScroll = 300;
+    let opacity = 1 - window.scrollY / maxScroll;
+    maskImg.style.opacity = Math.min(Math.max(opacity, 0), 1);
+  });
+
+  // Gradient cycling
+  const colorKeys = ['red', 'green', 'blue'];
+  let current = 0;
+  layers[colorKeys[current]].style.opacity = 1;
+
+  const colorMap = {
+    red: 'green',
+    green: 'blue',
+    blue: 'red',
+  };
+
+  function crossfade() {
+    const next = (current + 1) % colorKeys.length;
+    const nextKey = colorKeys[next];
+    const textKey = colorMap[nextKey];
+
+    layers[colorKeys[current]].style.opacity = 0;
+    layers[nextKey].style.opacity = 1;
+
+    if (isTouchDevice) {
+      const textColor = solidColors[textKey];
+      navLinks.forEach(link => {
+        link.style.transition = 'color 8s ease-in-out';
+        link.style.color = textColor;
+      });
+    }
+
+    current = next;
+  }
+
+  setTimeout(() => {
+    crossfade();
+    setInterval(crossfade, 9000);
+  }, 1000);
+
+  // Hide instruction
+  function hideInstruction() {
+    if (instruction) {
+      instruction.style.opacity = '0';
+      setTimeout(() => instruction.remove(), 600);
+    }
+  }
+  setTimeout(hideInstruction, 3000);
+
+  // Desktop hover logic
+  if (!isTouchDevice) {
+    const prevAngles = new Map();
+
+    function getShortestAngle(prev, next) {
+      let delta = next - prev;
+      while (delta > 180) delta -= 360;
+      while (delta < -180) delta += 360;
+      return prev + delta;
+    }
+
+    document.addEventListener('mousemove', e => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+
+      const el = document.elementFromPoint(targetX, targetY);
+      const isClickable = el?.closest('a:not(.no-cursor-hide), button, .nav-link');
+      cross.classList.toggle('clickable', !!isClickable);
+
+      navLinks.forEach((link, index) => {
+        const rect = link.getBoundingClientRect();
+        const centerY = rect.top + rect.height / 2;
+
+        const leftArrow = link.querySelector('.left-arrow');
+        if (leftArrow) {
+          const angle = Math.atan2(targetY - centerY, targetX - rect.left) * 180 / Math.PI;
+          leftArrow.style.transform = `translateY(-50%) rotate(${angle}deg)`;
+        }
+
+        const rightArrow = link.querySelector('.right-arrow');
+        if (rightArrow) {
+          const rawAngle = Math.atan2(targetY - centerY, targetX - rect.right) * 180 / Math.PI;
+          const desiredAngle = (rawAngle + 180) % 360;
+          const key = `right-${index}`;
+          const prev = prevAngles.get(key) ?? desiredAngle;
+          const smoothAngle = getShortestAngle(prev, desiredAngle);
+          prevAngles.set(key, smoothAngle);
+          rightArrow.style.transform = `translateY(-50%) rotate(${smoothAngle}deg)`;
+        }
+      });
+    });
+  }
+
+  // Touch behavior
+  if (isTouchDevice) {
+    document.addEventListener('touchstart', e => {
+      const touch = e.touches[0];
+      targetX = touch.clientX;
+      targetY = touch.clientY;
+      hideInstruction();
+    });
+
+    document.addEventListener('touchmove', e => {
+      const touch = e.touches[0];
+      targetX = touch.clientX;
+      targetY = touch.clientY;
+    });
+
+    // Swipe arrow tilt
+    let startX = null;
+    document.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+    });
+
+    document.addEventListener('touchend', e => {
+      if (!startX) return;
+      const endX = e.changedTouches[0].clientX;
+      const deltaX = endX - startX;
+      if (Math.abs(deltaX) > 30) {
+        const direction = deltaX > 0 ? 'right' : 'left';
+        navLinks.forEach(link => {
+          const left = link.querySelector('.left-arrow');
+          const right = link.querySelector('.right-arrow');
+          const angle = direction === 'right' ? 360 : -360;
+          if (left) left.style.transform = `translateY(-50%) rotate(${angle}deg)`;
+          if (right) right.style.transform = `translateY(-50%) rotate(${angle}deg)`;
+        });
+      }
+      startX = null;
+    });
+  }
+
+  // ✅ Smooth scroll to center of .header
+  const jumpLink = document.querySelector('a[href="#header"]');
+  if (jumpLink) {
+    jumpLink.addEventListener('click', e => {
+      e.preventDefault();
+
+      const header = document.querySelector('#header');
+      if (!header) return;
+
+      const headerRect = header.getBoundingClientRect();
+      const headerMiddle = headerRect.top + headerRect.height / 2;
+      const scrollToY = window.pageYOffset + headerMiddle - window.innerHeight / 2;
+
+      smoothScrollTo(scrollToY, 1200); // 1200ms = 1.2s
+    });
+  }
+
+  function smoothScrollTo(targetY, duration = 500) {
+    const startY = window.pageYOffset;
+    const distance = targetY - startY;
+    let startTime = null;
+
+  function easeInOutQuad(t) {
+    return t * (2 - t); // smoother, softer deceleration
+  }
+
+    function animation(currentTime) {
+      if (!startTime) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+      const ease = easeInOutQuad(progress);
+
+      window.scrollTo(0, startY + distance * ease);
+
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animation);
+      }
+    }
+
+    requestAnimationFrame(animation);
+  }
+});
+</script>
+
+</body>
+</html>
