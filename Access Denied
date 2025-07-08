@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head> 
+   <meta charset="UTF-8" />
+   <title>Access Denied</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <link rel="stylesheet" href="cstyle.css" />
+ </head>
+<body>
+  <div class="title-container">
+    <div class="page-title hover-link" tabindex="0">
+      <span class="left-arrow">&#62;</span>
+      Access Denied – Private Page
+      <span class="right-arrow">&#60;</span>
+    </div>
+  </div>
+  <div class="paraparent">
+    <p class="para">
+    Please contact Magdalena to view porject pages. </p>
+    <a class=link href="https://www.linkedin.com/in/magdalenaperez-moore/" target="_blank">connect on LinkedIn</a>
+  </div>
+
+  <header class="banner">
+    <div class="banner-left">
+      <a href="../MagdalenaPerez-Moore.html" class="logo-link" aria-label="Homepage">
+        <img src="Iassets/left-banner.png" alt="" class="banner-img" />
+      </a>
+    </div>
+
+    <div class="banner-right">
+      <a href="#" id="menu-toggle" tabindex="0" role="button" aria-label="Toggle menu">
+        <img src="Iassets/right-banner.png" alt="" class="banner-img" />
+      </a>
+    </div>
+  </header>
+
+
+  <div class="side-menu" id="side-menu">
+    <div class="close-btn" id="menu-close">&times;</div>
+    <ul>
+      <li><a href="Projects List.html">projects list</a></li>
+      <li><a href="Experimentation.html">experimentation</a></li>
+      <li><a href="Interactivity.html">interactivity</a></li>
+      <li><a href="Multimedia.html">multimedia</a></li>
+      <li><a href="Contact Info.html">contact info</a></li>
+    </ul>
+  </div>
+
+  <main>
+    <div class="cursor-gradient" id="cursor">
+      <div class="gradient-layer red"></div>
+      <div class="gradient-layer image"></div>
+      <div class="gradient-layer overlay"></div>
+    </div>
+
+    <div id="cursor-cross"><div class="dot"></div></div>
+  </main>
+
+  <script src="cscript.js"></script>
+</body>
+</html>
