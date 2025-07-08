@@ -22,14 +22,14 @@
 
   <header class="banner">
     <div class="banner-left">
-      <a href="../MagdalenaPerez-Moore.html" class="logo-link" aria-label="Homepage">
-        <img src="Iassets/left-banner.png" alt="" class="banner-img" />
+      <a href="MagdalenaPerez-Moore.html" class="logo-link" aria-label="Homepage">
+        <img src="left-banner.png" alt="" class="banner-img" />
       </a>
     </div>
 
     <div class="banner-right">
       <a href="#" id="menu-toggle" tabindex="0" role="button" aria-label="Toggle menu">
-        <img src="Iassets/right-banner.png" alt="" class="banner-img" />
+        <img src="right-banner.png" alt="" class="banner-img" />
       </a>
     </div>
   </header>
